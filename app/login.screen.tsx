@@ -7,6 +7,7 @@ import authService from "@/service/auth.service";
 import { saveUserData } from "@/utils/storage.util";
 import { mapUserResponseToUser } from "@/models/User.model";
 import { fetchAllServices } from "@/utils/fetchAllServices.util";
+import CText from "@/components/Text.component";
 
 const Logo = require("../assets/images/Logo.png");
 const GoogleLogo = require("../assets/images/GoogleLogo.png");
@@ -14,7 +15,7 @@ const GoogleLogo = require("../assets/images/GoogleLogo.png");
 const LogoSection = () => (
   <View style={tw`flex items-center`}>
     <Image source={Logo} style={tw`w-40 h-40`} />
-    <Text style={tw`text-2xl font-semibold mt-4`}>Welcome Back</Text>
+    <CText style="text-2xl font-semibold mt-4">Welcome Back</CText>
     <Text style={tw`text-lg font-light text-center mt-3 px-8`}>
       Let's continue the journey of tracking your child's growth and well-being
       together.
