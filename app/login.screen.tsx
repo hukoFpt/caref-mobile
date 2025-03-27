@@ -52,10 +52,11 @@ const InputField: React.FC<InputFieldProps> = ({
     <Text style={tw`px-4 my-2 font-semibold`}>{label}</Text>
     <TextInput
       style={[
-        tw`border rounded-full bg-white px-4 py-3`,
+        tw`border rounded-full bg-white px-4 py-3 overflow-hidden w-full`,
         isFocused ? tw`border-2 border-sky-500` : tw`border-sky-300`,
       ]}
       placeholder={placeholder}
+      placeholderTextColor={tw.color("gray-400")}
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
@@ -121,7 +122,7 @@ const GoogleLoginButton = () => (
 
 const SignUpLink = () => (
   <View style={tw`w-full px-8 mt-6`}>
-    <Link style={tw`px-4 pt-1`} href="/signup.screen">
+    <Link style={tw`flex px-4 pt-1 items-center justify-center`} href="/signup.screen">
       <Text style={tw` text-center font-semibold`}>
         Don't have an account?{" "}
         <Text style={tw`text-sky-500 underline`}>Sign Up</Text>

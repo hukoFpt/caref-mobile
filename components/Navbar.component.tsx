@@ -4,30 +4,73 @@ import HomeIcon from "@/assets/icons/Home.icon";
 import AccountIcon from "@/assets/icons/Account.icon";
 import SupportIcon from "@/assets/icons/Support.icon";
 import { View, TouchableOpacity, Text } from "react-native";
-import { Link } from "expo-router";
+import { router, usePathname } from "expo-router";
 
 const NavBar = () => {
+  const currentRoute = usePathname();
+  console.log(currentRoute);
   return (
     <View style={tw`absolute bottom-0 w-full px-4 pb-6 z-10`}>
       <View
-        style={tw`flex flex-row justify-between w-full bg-white rounded-full px-11 pt-3 pb-2`}
+        style={tw`flex flex-row justify-between w-full bg-white rounded-full px-12 pt-3 pb-2`}
       >
-        <Link style={tw`flex flex-col items-center`} href="/home.screen">
-          <HomeIcon />
-          <Text>Home</Text>
-        </Link>
-        <Link style={tw`flex flex-col items-center`} href="/support.screen">
+        <TouchableOpacity
+          style={tw`flex flex-col items-center w-16`}
+          disabled={currentRoute === "/home.screen"}
+          onPress={() => {
+            router.push("/home.screen");
+          }}
+        >
+          <HomeIcon isActive={currentRoute === "/home.screen"} />
+          <Text
+            style={tw`text-sm  ${
+              currentRoute === "/home.screen"
+                ? "text-sky-500 font-bold"
+                : "text-gray-500 font-light"
+            }`}
+          >
+            Home
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={tw`flex flex-col items-center`}
+          onPress={() => {
+            router.push("/support.screen");
+          }}
+        >
           <View style={tw`absolute bottom-4 p-3 bg-white rounded-full`}>
             <View style={tw`rounded-full p-2 z-5 bg-[#239AC6]`}>
               <SupportIcon />
             </View>
           </View>
-          <Text style={tw`pt-6 z-10`}>Support</Text>
-        </Link>
-        <Link style={tw`flex flex-col items-center`} href="/profile.screen">
-          <AccountIcon />
-          <Text>Account</Text>
-        </Link>
+          <Text
+            style={tw`pt-6 z-10 ${
+              currentRoute === "/support.screen"
+                ? "text-sky-500 font-bold"
+                : "text-gray-500 font-light"
+            }`}
+          >
+            Support
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={tw`flex flex-col items-center w-16`}
+          disabled={currentRoute === "/profile.screen"}
+          onPress={() => {
+            router.push("/profile.screen");
+          }}
+        >
+          <AccountIcon isActive={currentRoute === "/profile.screen"} />
+          <Text
+            style={tw`text-sm  ${
+              currentRoute === "/profile.screen"
+                ? "text-sky-500 font-bold"
+                : "text-gray-500 font-light"
+            }`}
+          >
+            Account
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

@@ -2,8 +2,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/https://swd-392-api.vercel.app/api/", //For web
-  // baseURL: "https://swd-392-api.vercel.app/api/", //For mobile
+  // baseURL: "http://localhost:8080/https://swd-392-api.vercel.app/api/", //For web
+  baseURL: "https://swd-392-api.vercel.app/api/", //For mobile
   timeout: 10000, 
   headers: {
     'Cache-Control': 'no-cache',

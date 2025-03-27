@@ -1,11 +1,12 @@
 import React from "react";
-
-import { View } from "react-native";
-
-import { Child } from "@/models/Child.model";
+import { View, Text } from "react-native";
 
 const ForgotPassword = () => {
-  return <View>This is the child selector screen</View>;
+  return (
+    <View>
+      <Text>Forgot password screen</Text>
+    </View>
+  );
 };
 
 export default ForgotPassword;

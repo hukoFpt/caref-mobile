@@ -51,6 +51,7 @@ const InputField = React.forwardRef<TextInput, InputFieldProps>(({
         isFocused ? tw`border-2 border-sky-500` : tw`border-sky-300`,
       ]}
       placeholder={placeholder}
+      placeholderTextColor={tw.color("gray-400")}
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
@@ -77,7 +78,7 @@ const SignUpButton: React.FC<{ onPress: () => void }> = ({ onPress }) => (
 
 const LoginLink = () => (
   <View style={tw`w-full px-8 mt-6`}>
-    <Link style={tw`px-4 pt-1`} href="/login.screen">
+    <Link style={tw`flex items-center justify-center px-4 pt-1`} href="/login.screen">
       <Text style={tw`text-center font-semibold`}>
         Already have an account?{" "}
         <Text style={tw`text-sky-500 underline`}>Log In</Text>
