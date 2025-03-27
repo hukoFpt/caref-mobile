@@ -22,7 +22,6 @@ class AuthServiceImpl implements AuthService {
 
       if (response.data && response.data.token) {
         await AsyncStorage.setItem(this.tokenKey, response.data.token);
-        await AsyncStorage.setItem(this.userKey, JSON.stringify(response.data.user));
         return response.data;
       }
       return null;
@@ -46,7 +45,6 @@ class AuthServiceImpl implements AuthService {
 
       if (response.data && response.data.token) {
         await AsyncStorage.setItem(this.tokenKey, response.data.token);
-        await AsyncStorage.setItem(this.userKey, JSON.stringify(response.data.user));
         return true;
       }
       return false;

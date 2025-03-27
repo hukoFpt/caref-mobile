@@ -3,6 +3,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import tw from "twrnc";
 import * as SplashScreen from 'expo-splash-screen';
+import authService from "@/service/auth.service";
+import { saveUserData } from "@/utils/storage.util";
+import { mapUserResponseToUser } from "@/models/User.model";
+import { fetchAllServices } from "@/utils/fetchAllServices.util";
 
 const Logo = require("../assets/images/Logo.png");
 const GoogleLogo = require("../assets/images/GoogleLogo.png");
@@ -63,13 +67,20 @@ const InputField: React.FC<InputFieldProps> = ({
   </View>
 );
 
-const LoginButton: React.FC<{ onPress: () => void }> = ({ onPress }) => (
+const LoginButton: React.FC<{ onPress: () => void; isLoading: boolean }> = ({
+  onPress,
+  isLoading,
+}) => (
   <View style={tw`w-full px-8 mt-6`}>
     <TouchableOpacity
-      style={tw`bg-sky-500 rounded-full py-3`}
+      style={tw`rounded-full py-3 ${isLoading ? "bg-gray-400" : "bg-sky-500"
+        }`}
       onPress={onPress}
+      disabled={isLoading}
     >
-      <Text style={tw`text-white text-center font-semibold`}>Sign In</Text>
+      <Text style={tw`text-white text-center font-semibold`}>
+        {isLoading ? "Signing In..." : "Sign In"}
+      </Text>
     </TouchableOpacity>
   </View>
 );
@@ -97,7 +108,7 @@ const GoogleLoginButton = () => (
   <View style={tw`w-full px-8 mt-6`}>
     <TouchableOpacity
       style={tw`flex flex-row gap-3 items-center justify-center border border-sky-500 bg-white rounded-full py-3`}
-      onPress={() => {}}
+      onPress={() => { }}
     >
       <Image source={GoogleLogo} style={tw`w-6 h-6`} />
       <Text style={tw`text-sky-500 text-center font-semibold`}>
@@ -121,6 +132,7 @@ const SignUpLink = () => (
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
@@ -134,11 +146,23 @@ export default function LoginScreen() {
     };
   }, []);
 
-  const handleLogin = () => {
-    // Handle login logic here
-    console.log("Username:", username);
-    console.log("Password:", password);
-    router.push("/home.screen");
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const response = await authService.login(username, password);
+      if (response?.user.role === "Member") {
+        const user = mapUserResponseToUser(response);
+        await saveUserData(user);
+        await fetchAllServices();
+        router.push("/home.screen");
+      }
+    }
+    catch (error) {
+      console.error("Login failed:", error);
+      alert("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -170,7 +194,7 @@ export default function LoginScreen() {
         onSubmitEditing={handleLogin}
       />
       <ForgotPasswordLink />
-      <LoginButton onPress={handleLogin} />
+      <LoginButton onPress={handleLogin} isLoading={isLoading} />
       <Divider />
       <GoogleLoginButton />
       <SignUpLink />
