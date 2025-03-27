@@ -12,7 +12,16 @@ const NavBar = () => {
   return (
     <View style={tw`absolute bottom-0 w-full px-4 pb-6 z-10`}>
       <View
-        style={tw`flex flex-row justify-between w-full bg-white rounded-full px-12 pt-3 pb-2`}
+        style={[
+          tw`flex flex-row justify-between w-full bg-white rounded-full px-12 pt-3 pb-2`,
+          {
+            shadowColor: "#000", // Shadow color
+            shadowOffset: { width: 0, height: 0 }, // Shadow around (no offset)
+            shadowOpacity: 0.1, // Shadow transparency
+            shadowRadius: 1, // Spread of the shadow
+            elevation: 5, // Android shadow
+          },
+        ]}
       >
         <TouchableOpacity
           style={tw`flex flex-col items-center w-16`}
@@ -57,13 +66,13 @@ const NavBar = () => {
           style={tw`flex flex-col items-center w-16`}
           disabled={currentRoute === "/profile.screen"}
           onPress={() => {
-            router.push("/profile.screen");
+            router.push("/account.screen");
           }}
         >
-          <AccountIcon isActive={currentRoute === "/profile.screen"} />
+          <AccountIcon isActive={currentRoute === "/account.screen"} />
           <Text
             style={tw`text-sm  ${
-              currentRoute === "/profile.screen"
+              currentRoute === "/account.screen"
                 ? "text-sky-500 font-bold"
                 : "text-gray-500 font-light"
             }`}

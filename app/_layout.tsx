@@ -43,7 +43,7 @@ export default function RootLayout() {
   const routesWithNavBar = [
     "/home.screen",
     "/support.screen",
-    "/profile.screen",
+    "/account.screen",
   ];
 
   const showNavBar = routesWithNavBar.includes(currentRoute);
@@ -53,7 +53,7 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={tw`flex-1 bg-sky-50 pt-4`}>
+    <View style={tw`flex-1 bg-sky-50`}>
       <StatusBar style="dark" />
       {showNavBar && <NavBar />}
       <Stack

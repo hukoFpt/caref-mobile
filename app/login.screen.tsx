@@ -1,6 +1,6 @@
 import { Link, useRouter } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity, BackHandler, Alert } from "react-native";
 import tw from "twrnc";
 import * as SplashScreen from 'expo-splash-screen';
 import authService from "@/service/auth.service";
@@ -166,6 +166,30 @@ export default function LoginScreen() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      // Show an alert before exiting the app (optional)
+      Alert.alert("Exit App", "Are you sure you want to exit?", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel",
+        },
+        {
+          text: "Exit",
+          onPress: () => BackHandler.exitApp(),
+        },
+      ]);
+      return true; // Prevent default back navigation
+    };
+
+    // Add event listener for back button
+    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    // Cleanup the event listener on unmount
+    return () => BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+  }, []);
 
   return (
     <View style={tw`flex flex-col items-center h-full`}>

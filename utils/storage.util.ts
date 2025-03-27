@@ -6,6 +6,11 @@ export const saveUserData = async (user: User) => {
   await AsyncStorage.setItem("user", JSON.stringify(user));
 };
 
+export const getUserData = async () => {
+  const user = await AsyncStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+};
+
 export const saveChildrenData = async (children: SelectedChild[]) => {
   await AsyncStorage.setItem("children", JSON.stringify(children));
 };
