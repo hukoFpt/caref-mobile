@@ -2,12 +2,7 @@ import { Link, useRouter } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import tw from "twrnc";
-import * as SplashScreen from "expo-splash-screen";
-import authService from "../service/auth.service";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import orderService from "@/service/order.service";
-import childService from "@/service/child.service";
-import recordService from "@/service/record.service";
+import * as SplashScreen from 'expo-splash-screen';
 
 const Logo = require("../assets/images/Logo.png");
 const GoogleLogo = require("../assets/images/GoogleLogo.png");
@@ -124,9 +119,9 @@ const SignUpLink = () => (
 );
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const passwordInputRef = useRef<TextInput>(null);
@@ -139,55 +134,24 @@ export default function LoginScreen() {
     };
   }, []);
 
-  const handleLogin = async () => {
-    const response = await authService.login(email, password);
-    if (response) {
-      try {
-        // Fetch orders and update user data
-        const ordersCode = await orderService.getMemberOrdersCode();
-        const user = {
-          ...response.user,
-          subscription: ordersCode.planCode || "No Subscription",
-          subscription_id: ordersCode._id || "No Subscription",
-        };
-        await AsyncStorage.setItem("user", JSON.stringify(user));
-
-        // Fetch child data
-        const children = await childService.getChildren();
-        await AsyncStorage.setItem("children", JSON.stringify(children));
-
-        // Fetch records
-        const recordsResponse = await recordService.getRecordsByMemberId();
-        const records = recordsResponse.data || [];
-        await AsyncStorage.setItem("records", JSON.stringify(records));
-
-        // Set the first child as the default selected child if children are not null
-        if (children.length > 0) {
-          await AsyncStorage.setItem(
-            "selectedChild",
-            JSON.stringify(children[0])
-          );
-        }
-      } catch (error) {
-        console.warn("No orders found");
-      }
-      router.replace("/home.screen");
-    } else {
-      console.log("Login failed");
-    }
+  const handleLogin = () => {
+    // Handle login logic here
+    console.log("Username:", username);
+    console.log("Password:", password);
+    router.push("/home.screen");
   };
 
   return (
     <View style={tw`flex flex-col items-center h-full`}>
       <LogoSection />
       <InputField
-        label="Your email"
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        onFocus={() => setIsEmailFocused(true)}
-        onBlur={() => setIsEmailFocused(false)}
-        isFocused={isEmailFocused}
+        label="Your username"
+        value={username}
+        onChangeText={setUsername}
+        placeholder="Username"
+        onFocus={() => setIsUsernameFocused(true)}
+        onBlur={() => setIsUsernameFocused(false)}
+        isFocused={isUsernameFocused}
         returnKeyType="next"
         onSubmitEditing={() =>
           passwordInputRef.current && passwordInputRef.current.focus()
