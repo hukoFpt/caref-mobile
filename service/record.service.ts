@@ -7,6 +7,9 @@ interface RecordService {
     recordId: string;
     childId: string;
   }): Promise<any>;
+  deactivateRecord(requestData: {
+    recordId: string;
+  }): Promise<any>;
   getRecords(): Promise<Record[]>;
 }
 
@@ -25,6 +28,21 @@ class RecordServiceImpl implements RecordService {
       return response.data;
     } catch (error) {
       console.error("Error activating record:", error);
+      throw error;
+    }
+  }
+
+  async deactivateRecord(requestData: {
+    recordId: string;
+  }): Promise<any> {
+    try {
+      const response = await axiosInstance.put(
+        `${this.API_URL}/deactivate`,
+        requestData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deactivating record:", error);
       throw error;
     }
   }
@@ -55,22 +73,19 @@ class RecordServiceImpl implements RecordService {
         },
       };
   
-      // Map over the records to transform OrderId into Order and exclude __v
       const records = response.data.data.map((record: any) => {
-        const { OrderId, __v, ...rest } = record; // Extract OrderId and exclude __v
+        const { OrderId, __v, ...rest } = record;
   
-        // Get serviceName and serviceCode from serviceMapping using serviceId
         const serviceDetails = serviceMapping[OrderId.serviceId] || {
           serviceName: "Unknown Service",
           serviceCode: "N/A",
         };
   
-        // Transform OrderId to match the Order interface
         const transformedOrder: Order = {
           _id: OrderId._id,
           memberId: OrderId.memberId,
-          serviceName: serviceDetails.serviceName, // Replace serviceId with serviceName
-          serviceCode: serviceDetails.serviceCode, // Replace serviceId with serviceCode
+          serviceName: serviceDetails.serviceName, 
+          serviceCode: serviceDetails.serviceCode, 
           status: OrderId.status,
           orderCode: OrderId.orderCode,
           amount: OrderId.amount,

@@ -3,6 +3,7 @@ export interface Child {
   memberID: number;
   fname: string;
   lname: string;
+  active: boolean;
   birthdate: string;
   gender: string;
   picture: string;

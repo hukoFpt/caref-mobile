@@ -3,27 +3,58 @@ import childService from "@/service/child.service";
 import recordService from "@/service/record.service";
 import orderService from "@/service/order.service";
 
-export const fetchAllServices = async () => {
+export const fetchChildrenService = async () => {
   try {
-    // Fetch children data
     const children = await childService.getChildren();
-    await AsyncStorage.setItem("children", JSON.stringify(children));
+    const records = await recordService.getRecords();
 
-    // Set the first child as the default selected child
-    if (children.length > 0) {
+    const updatedChildren = children.map((child) => {
+      const isActive = records.some((record) => record.ChildId === child._id);
+      return { ...child, active: isActive };
+    });
+
+    await AsyncStorage.setItem("children", JSON.stringify(updatedChildren));
+
+    const selectedChild = await AsyncStorage.getItem("selectedChild");
+    if (!selectedChild && children.length > 0) {
       await AsyncStorage.setItem("selectedChild", JSON.stringify(children[0]));
     }
+  } catch (error) {
+    console.error("Failed to fetch children service:", error);
+    throw error;
+  }
+};
 
-    // Fetch order data
+export const fetchRecordsService = async () => {
+  try {
+    const records = await recordService.getRecords();
+    const updatedRecords = records.map((record) => {
+      if (record.Status === "Inactivated") {
+        const { ChildId, ExpiredDate, ...rest } = record;
+        return rest;
+      }
+      return record;
+    });
+
+    await AsyncStorage.setItem("records", JSON.stringify(updatedRecords));
+  } catch (error) {
+    console.error("Failed to fetch records service:", error);
+    throw error;
+  }
+};
+
+export const fetchMemberOrderService = async () => {
+  try {
     const order = await orderService.getMemberOrder();
     await AsyncStorage.setItem("orders", JSON.stringify(order));
-
-    // Fetch records data
-    const records = await recordService.getRecords();
-    await AsyncStorage.setItem("records", JSON.stringify(records));
-    
   } catch (error) {
-    console.error("Failed to fetch services:", error);
-    throw error; // Re-throw the error to handle it in the calling function
+    console.error("Failed to fetch member order service:", error);
+    throw error;
   }
+};
+
+export const fetchAllServices = async (): Promise<void> => {
+  await fetchChildrenService();
+  await fetchRecordsService();
+  await fetchMemberOrderService();
 };
