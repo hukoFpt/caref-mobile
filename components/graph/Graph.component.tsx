@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LineChart } from "react-native-chart-kit";
-import { Dimensions, View, Text, Picker } from "react-native";
+import { Dimensions, View, Text } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import tw from "twrnc";
 
 const screenWidth = Dimensions.get("window").width;
@@ -89,14 +90,14 @@ const Graph: React.FC<GraphProps> = ({ primaryData = [], secondaryData = [] }) =
           <Picker.Item label="Weight" value="weight" />
         </Picker>
       </View>
-      <LineChart
+      {/* <LineChart
         data={graphData}
         width={screenWidth - 32}
         height={220}
         chartConfig={chartConfig}
         bezier
         withDots={false} // Disable the dots
-      />
+      /> */}
     </View>
   );
 };

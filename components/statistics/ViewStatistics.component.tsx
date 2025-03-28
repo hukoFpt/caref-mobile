@@ -5,7 +5,7 @@ import tw from "twrnc";
 const ViewStatistics = () => (
   <View style={tw`p-4`}>
     <Text style={tw`font-bold text-lg`}>Stats Index</Text>
-    <Graph primaryData={[]} />
+    {/* <Graph primaryData={[]} /> */}
   </View>
 );
 

@@ -1,14 +1,12 @@
 export interface SelectedChild {
-    _id: string;
-    fname: string;
-    lname: string;
-    memberID: string;
-    birthdate: string;
-    gender: string;
-    picture: string;
-    blood_type: string;
-    allergy: string;
-    __v: number;
-  }
-  
-  export default SelectedChild;
+  _id: string;
+  memberID: number;
+  fname: string;
+  lname: string;
+  birthdate: string;
+  gender: string;
+  picture: string;
+  blood_type: string;
+  allergy: string;
+  notes: string;
+}

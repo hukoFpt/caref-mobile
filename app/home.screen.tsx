@@ -3,7 +3,7 @@ import tw from "twrnc";
 import { View, Text, TouchableOpacity } from "react-native";
 import { UserCenter } from "@/components/index/UserCenter.component";
 import ArrowDownIcon from "@/assets/icons/ArrowDown.icon";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import IndexStat from "@/components/index/IndexStat.component";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import childService from "@/service/child.service";
@@ -129,23 +129,23 @@ export default function HomeScreen() {
       <ChildSelector selectedChildName={selectedChildName} />
       <IndexStat />
       <View style={tw`mt-4 flex flex-row gap-4 justify-between`}>
-        <TouchableOpacity style={tw`flex-row w-5/11 bg-sky-500 p-2 rounded-lg`}>
-          <Link
-            href="/child-information.screen?mode=VIEW"
-            style={tw`flex flex-row gap-2 items-center justify-center`}
-          >
-            <ProfileIcon />
-            <Text style={tw`text-white font-bold text-lg`}>Information</Text>
-          </Link>
+        <TouchableOpacity
+          style={tw`flex-row w-[48%] bg-sky-500 p-2 rounded-lg gap-2 items-center`}
+          onPress={() => {
+            router.push("/child-information.screen?mode=VIEW");
+          }}
+        >
+          <ProfileIcon />
+          <Text style={tw`text-white font-bold text-lg`}>Information</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={tw`flex-row w-5/11 bg-sky-500 p-2 rounded-lg`}>
-          <Link
-            href="/statistic.screen?mode=EDIT"
-            style={tw`flex flex-row gap-2 items-center justify-center`}
-          >
-            <ProfileIcon />
-            <Text style={tw`text-white font-bold`}>Statistic</Text>
-          </Link>
+        <TouchableOpacity
+          style={tw`flex-row w-[48%] bg-sky-500 p-2 rounded-lg gap-2 items-center`}
+          onPress={() => {
+            router.push("/statistic.screen?mode=EDIT");
+          }}
+        >
+          <ProfileIcon />
+          <Text style={tw`text-white font-bold text-lg`}>Statistic</Text>
         </TouchableOpacity>
       </View>
     </View>

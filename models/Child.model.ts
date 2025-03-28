@@ -6,7 +6,7 @@ export interface Child {
   birthdate: string;
   gender: string;
   picture: string;
-  bloodType: "A-" | "A+" | "B-" | "B+" | "AB-" | "AB+" | "O-" | "O+";
+  blood_type: string;
   allergy: string;
   notes: string;
 }

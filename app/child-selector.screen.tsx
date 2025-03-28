@@ -112,9 +112,6 @@ export default function ChildSelectorScreen() {
           onSelectChild={handleSelectChild}
         />
       </View>
-      <Link href={{ pathname: "/child-information.screen", params: { mode: "CREATE" } }} style={tw`bg-white m-4 p-4 items-center justify-center rounded-lg`}>
-        <Text style={tw`font-semibold text-sky-500`}>Add child</Text>
-      </Link>
     </View>
   );
 }

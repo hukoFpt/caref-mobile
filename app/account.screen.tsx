@@ -68,13 +68,14 @@ const NavigateButton = ({
   icon,
   title,
 }: {
-  to: string;
+  to: string; 
   icon: string;
   title: string;
 }) => {
   return (
     <TouchableOpacity
       style={tw`flex flex-row items-center justify-between bg-white`}
+      onPress={() => router.push(to as any)}
     >
       <View style={tw`flex flex-row items-center gap-2`}>
         {icon === "children" && <ChildrenIcon />}
@@ -89,7 +90,7 @@ const NavigateButton = ({
 const LogOutButton = () => {
   return (
     <TouchableOpacity
-      style={tw`w-full h-12 flex flex-row gap-2 items-center justify-center bg-white rounded-xl`}
+      style={tw`w-full h-12 flex flex-row mt-6 gap-2 items-center justify-center bg-white rounded-xl`}
       onPress={() => {
         AsyncStorage.clear();
         router.replace("/login.screen");
@@ -118,14 +119,41 @@ export default function AccountScreen() {
           />
           <View style={tw`h-[0.5px] bg-neutral-600`}></View>
           <NavigateButton
-            to="/statistic.screen"
+            to="/statistic.screen?mode=EDIT"
             icon="statistic"
             title="Children statistic"
           />
         </View>
         <Text style={tw`text-xl font-semibold pt-4`}>Account Management</Text>
-
+        <View style={tw`flex flex-col mt-2 p-4 bg-white gap-4 rounded-xl`}>
+          <NavigateButton
+            to="/purchased.screen"
+            icon="profile"
+            title="Purchase management"
+          />
+          <View style={tw`h-[0.5px] bg-neutral-600`}></View>
+          <NavigateButton
+            to="/activation.screen"
+            icon="profile"
+            title="Activation management"
+          />
+        </View>
+        <Text style={tw`text-xl font-semibold pt-4`}>Setting</Text>
+        <View style={tw`flex flex-col mt-2 p-4 bg-white gap-4 rounded-xl`}>
+          <NavigateButton
+            to="/profile.screen"
+            icon="profile"
+            title="Account setting"
+          />
+          <View style={tw`h-[0.5px] bg-neutral-600`}></View>
+          <NavigateButton
+            to="/policies.screen"
+            icon="profile"
+            title="Policies"
+          />
+        </View>
         <LogOutButton />
+        <Text style={tw`text-right pt-2 text-sm font-light`}>Version: 1.0.45</Text>
       </View>
     </View>
   );

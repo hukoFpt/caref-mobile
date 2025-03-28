@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import tw from "twrnc";
 import { useRouter } from "expo-router";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Child } from "@/models/Child.model";
 
 const StatInput = ({
@@ -107,18 +114,24 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
   };
 
   const [date, setDate] = useState(getCurrentDate());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [bmi, setBmi] = useState("");
   const [bmiCategory, setBmiCategory] = useState("");
 
-  const handleDateChange = (text: string) => {
-    const formattedDate = text
-      .replace(/\D/g, "")
-      .replace(/(\d{2})(\d)/, "$1-$2")
-      .replace(/(\d{2})(\d)/, "$1-$2")
-      .replace(/(\d{4})(\d)/, "$1");
-    setDate(formattedDate);
+  const formatDate = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false); // Close the date picker
+    if (selectedDate) {
+      setDate(formatDate(selectedDate)); // Update the selected date
+    }
   };
 
   const fetchStatistics = async () => {
@@ -198,19 +211,27 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
       <View style={tw`flex-row items-center justify-between`}>
         <Text style={tw`font-bold text-lg`}>Stats Index</Text>
         <View style={tw`flex-row items-center gap-2`}>
-          <TextInput
-            style={tw`ml-4 w-20 text-center border-b border-gray-400`}
-            value={date}
-            onChangeText={handleDateChange}
-            placeholder="DD-MM-YYYY"
-            keyboardType="numeric"
-            maxLength={10}
-          />
+          <TouchableOpacity
+            style={tw`bg-sky-500 rounded-full px-4 py-1`}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={tw`text-white font-bold`}>
+              {formatDate(new Date(date.split("-").reverse().join("-")))}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={new Date(date.split("-").reverse().join("-"))}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={handleDateChange}
+            />
+          )}
           <TouchableOpacity
             style={tw`bg-sky-500 rounded-full px-2`}
             onPress={fetchStatistics}
           >
-            <Text style={tw`text-sm text-white`}>Fetch</Text>
+            <Text style={tw`text-white px-2 py-1 font-semibold`}>Check</Text>
           </TouchableOpacity>
         </View>
       </View>
