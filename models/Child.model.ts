@@ -1,6 +1,7 @@
 export interface Child {
   _id: string;
-  memberID: number;
+  memberId: number;
+  recordId: string;
   fname: string;
   lname: string;
   active: boolean;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import tw from "twrnc";
 import { useRouter } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Child } from "@/models/Child.model";
+import trackingService from "@/service/tracking.service";
 
 const StatInput = ({
   label,
@@ -29,29 +30,31 @@ const StatInput = ({
   placeholder: string;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
 }) => {
-  const [inputWidth, setInputWidth] = useState(120);
+  const [inputWidth, setInputWidth] = useState(10);
 
   return (
     <View style={tw`mt-4 bg-sky-500 border border-sky-500 rounded-lg w-[48%]`}>
       <View style={tw` bg-white rounded-lg px-2`}>
         <Text style={tw`text-neutral-700`}>{label.toUpperCase()}</Text>
         <View style={tw`flex-row justify-between items-baseline`}>
-          <TextInput
-            style={[tw`pb-1 w-1/3 text-4xl font-bold`, { width: inputWidth }]}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            keyboardType={keyboardType}
-            placeholderTextColor={"#ddd"}
-            onContentSizeChange={(e) =>
-              setInputWidth(e.nativeEvent.contentSize.width + 30)
-            }
-          />
+          <View style={[tw`w-20`]}>
+            <TextInput
+              style={[tw`pb-1 text-4xl font-bold`, { width: inputWidth }]}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder={placeholder}
+              keyboardType={keyboardType}
+              placeholderTextColor={"#ddd"}
+              onContentSizeChange={(e) =>
+                setInputWidth(e.nativeEvent.contentSize.width + 30)
+              }
+            />
+          </View>
           <Text style={tw`font-bold w-full text-neutral-700`}>{unit}</Text>
         </View>
       </View>
       <Text style={tw`pl-2 text-sm font-light`}>
-        Last Updated:
+        Last Updated:{" "}
         <Text style={tw`p-2 text-sm font-light text-white`}>{lastUpdated}</Text>
       </Text>
     </View>
@@ -92,18 +95,26 @@ const BMIDisplay = ({
           <Text style={tw`font-bold w-full text-neutral-700`}>kg/m</Text>
         </View>
       </View>
-      <Text style={tw`pl-2 text-sm font-light`}>
-        Status:
-        <Text style={tw`font-bold pl-1 ${getCategoryColor(bmiCategory)}`}>
-          {bmiCategory}
-        </Text>
-      </Text>
+      <View style={tw`flex-row items-baseline rounded-lg px-2`}>
+        <Text style={tw`pl-2 text-sm font-light`}>Status:</Text>
+        <View
+          style={tw`flex-row items-baseline bg-white rounded-full px-2 m-1`}
+        >
+          <Text style={tw`font-bold pl-1 ${getCategoryColor(bmiCategory)}`}>
+            {bmiCategory}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };
 
 const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
   const router = useRouter();
+
+  useEffect(() => {
+    fetchStatistics(getCurrentDate());
+  }, []);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -119,6 +130,7 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
   const [weight, setWeight] = useState("");
   const [bmi, setBmi] = useState("");
   const [bmiCategory, setBmiCategory] = useState("");
+  const [lastUpdated, setLastUpdated] = useState("");
 
   const formatDate = (date: Date): string => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -130,26 +142,45 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false); // Close the date picker
     if (selectedDate) {
-      setDate(formatDate(selectedDate)); // Update the selected date
+      const formattedDate = formatDate(selectedDate);
+      setDate(formattedDate); // Update the selected date
+      fetchStatistics(formattedDate); // Fetch statistics for the new date
     }
   };
 
-  const fetchStatistics = async () => {
+  const fetchStatistics = async (selectedDate?: string) => {
     try {
+      const dateToFetch = selectedDate || date;
       const existingStats = await AsyncStorage.getItem("statistics");
       const statsData = existingStats ? JSON.parse(existingStats) : {};
-      const stats = statsData[selectedChild._id]?.[date];
-      if (stats) {
-        setHeight(stats.height);
-        setWeight(stats.weight);
-        setBmi(stats.bmi);
-        setBmiCategory(stats.bmiCategory);
+      const childStats = statsData[selectedChild._id];
+
+      if (childStats) {
+        // Find the latest date in the statistics
+        const latestDate = Object.keys(childStats).sort().reverse()[0];
+        const stats = childStats[dateToFetch] || childStats[latestDate];
+
+        if (stats) {
+          setHeight(stats.height);
+          setWeight(stats.weight);
+          setBmi(stats.bmi);
+          setBmiCategory(stats.bmiCategory);
+          setLastUpdated(latestDate); // Set the latest date
+        } else {
+          setHeight("");
+          setWeight("");
+          setBmi("");
+          setBmiCategory("");
+          setLastUpdated(""); // Clear the last updated date
+          console.log("No statistics found for the selected date.");
+        }
       } else {
         setHeight("");
         setWeight("");
         setBmi("");
         setBmiCategory("");
-        console.log("No statistics found for the selected date.");
+        setLastUpdated(""); // Clear the last updated date
+        console.log("No statistics found for the selected child.");
       }
     } catch (error) {
       console.error("Failed to fetch statistics", error);
@@ -180,25 +211,36 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
     setBmi(calculatedBMI.toString());
     setBmiCategory(bmiCategory);
 
-    const stats = {
-      height,
-      weight,
-      bmi: calculatedBMI.toString(),
-      bmiCategory,
-      updatedDate: new Date().toISOString(),
-    };
-
     try {
-      const existingStats = await AsyncStorage.getItem("statistics");
-      const statsData = existingStats ? JSON.parse(existingStats) : {};
-      if (!statsData[selectedChild._id]) {
-        statsData[selectedChild._id] = {};
+      // Fetch records from AsyncStorage
+      const recordsString = await AsyncStorage.getItem("records");
+      const records = recordsString ? JSON.parse(recordsString) : [];
+
+      // Find the matching record for the selected child
+      const matchingRecord = records.find(
+        (record: any) => record.ChildId === selectedChild._id
+      );
+
+      if (!matchingRecord) {
+        console.error("No matching record found for the selected child.");
+        return;
       }
-      statsData[selectedChild._id][date] = stats;
-      await AsyncStorage.setItem("statistics", JSON.stringify(statsData));
-      console.log("Statistics saved successfully!");
+
+      const payload = {
+        recordId: matchingRecord._id,
+        date: date.split("-").reverse().join("-"),
+        growthStats: {
+          Height: height,
+          Weight: weight,
+        },
+      };
+
+      const response = await trackingService.createTracking(payload);
+      await trackingService.getMemberTracking(matchingRecord._id);
+
+      console.log("Tracking created successfully:", response);
     } catch (error) {
-      console.error("Failed to save statistics", error);
+      console.error("Failed to save statistics or create tracking", error);
     }
   };
 
@@ -227,12 +269,6 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
               onChange={handleDateChange}
             />
           )}
-          <TouchableOpacity
-            style={tw`bg-sky-500 rounded-full px-2`}
-            onPress={fetchStatistics}
-          >
-            <Text style={tw`text-white px-2 py-1 font-semibold`}>Check</Text>
-          </TouchableOpacity>
         </View>
       </View>
       <View style={tw`flex flex-row justify-between`}>
@@ -240,7 +276,7 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
           label="Height"
           value={height}
           unit="cm"
-          lastUpdated="2021-09-01"
+          lastUpdated={lastUpdated}
           onChangeText={setHeight}
           placeholder="00"
           keyboardType="numeric"
@@ -249,7 +285,7 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
           label="Weight"
           value={weight}
           unit="kg"
-          lastUpdated="2021-09-01"
+          lastUpdated={lastUpdated}
           onChangeText={setWeight}
           placeholder="00"
           keyboardType="numeric"
@@ -275,3 +311,6 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
 };
 
 export default EditStatistics;
+function getMemberTracking(_id: any) {
+  throw new Error("Function not implemented.");
+}

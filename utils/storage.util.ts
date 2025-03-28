@@ -21,7 +21,21 @@ export const getChildrenData = async () => {
   return children ? JSON.parse(children) : [];
 };
 
-export const saveSelectedChild = async (child: SelectedChild) => {
+export const saveSelectedChild = async (
+  child: SelectedChild,
+  records: any[]
+) => {
+  // Find the record that matches the child's _id
+  const matchingRecord = records.find((record) => record.ChildId === child._id);
+
+  // If a matching record is found, add the recordId to the child object
+  if (matchingRecord) {
+    child.recordId = matchingRecord._id; // Add the recordId field to the selected child
+  } else {
+    console.warn("No matching record found for the selected child.");
+  }
+
+  // Save the updated child object to AsyncStorage
   await AsyncStorage.setItem("selectedChild", JSON.stringify(child));
 };
 
