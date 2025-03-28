@@ -13,6 +13,29 @@ import {
   ImageBackground,
 } from "react-native";
 import tw, { style } from "twrnc";
+import { getBadge } from "@/utils/getBadge";
+import { useEffect, useState } from "react";
+
+import SilverIcon from "@/assets/icons/subscription/Silver.icon";
+import GoldIcon from "@/assets/icons/subscription/Gold.icon";
+import PlatinumIcon from "@/assets/icons/subscription/Platinum.icon";
+import DiamondIcon from "@/assets/icons/subscription/Diamond.icon";
+
+const subscriptionColors: { [key: string]: string } = {
+  Free: "bg-slate-300",
+  "1": "bg-gray-400", // Silver
+  "2": "bg-orange-400", // Gold
+  "3": "bg-sky-500", // Platinum
+  "4": "bg-violet-600", // Diamond
+};
+
+const subscriptionName: { [key: string]: string } = {
+  Free: "Free",
+  "1": "Sprout",
+  "2": "Bloom",
+  "3": "Thrive",
+  "4": "Peak",
+};
 
 const Logo = require("../assets/images/Logo.png");
 const Ellipse3 = require("../assets/images/Ellipse-3.png");
@@ -20,7 +43,79 @@ const Ellipse4 = require("../assets/images/Ellipse-4.png");
 const SubscriptionBackground = require("../assets/images/Subscription.png");
 
 const UserCenter = () => {
-  const user = useUser();
+  const [userName, setUserName] = useState<string>("User");
+  const [avatar, setAvatar] = useState<string>("https://picsum.photos/150");
+  const [subscriptionPlan, setSubscriptionPlan] = useState<string>("Free");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userString = await AsyncStorage.getItem("user");
+        if (userString) {
+          const user = JSON.parse(userString);
+          setUserName(user.userName || "User");
+          setAvatar(user.avatar || "https://picsum.photos/150");
+        }
+
+        const badge = await getBadge();
+        setSubscriptionPlan(badge);
+      } catch (error) {
+        console.error("Error fetching user data or badge:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const bgColor = subscriptionColors[subscriptionPlan] || "bg-white";
+  const planName = subscriptionName[subscriptionPlan] || "Free";
+
+  const renderIcon = () => {
+    switch (subscriptionPlan) {
+      case "Free":
+        return (
+          <View
+            style={tw`flex items-center justify-center rounded-full h-6 w-6 bg-white`}
+          >
+            <Text style={tw`text-xs text-slate-600`}>-</Text>
+          </View>
+        );
+      case "1":
+        return (
+          <View
+            style={tw`flex items-center justify-center rounded-full h-6 w-6 bg-white`}
+          >
+            <SilverIcon />
+          </View>
+        );
+      case "2":
+        return (
+          <View
+            style={tw`flex items-center justify-center rounded-full h-6 w-6 bg-white`}
+          >
+            <GoldIcon />
+          </View>
+        );
+      case "3":
+        return (
+          <View
+            style={tw`flex items-center justify-center rounded-full h-6 w-6 bg-white`}
+          >
+            <PlatinumIcon />
+          </View>
+        );
+      case "4":
+        return (
+          <View
+            style={tw`flex items-center justify-center rounded-full h-6 w-6 bg-white`}
+          >
+            <DiamondIcon />
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <View style={tw`flex-col items-center justify-between px-4 pt-8 my-4`}>
@@ -31,12 +126,14 @@ const UserCenter = () => {
       <Image
         source={Ellipse4}
         style={tw`absolute w-[400px] h-[400px] right-0 top-[-4]`}
-      />
-      <Image
-        source={{ uri: "https://picsum.photos/150" }}
-        style={tw`w-16 h-16 rounded-full`}
-      ></Image>
-      <Text style={tw`mt-2 font-bold text-2xl`}>{user?.userName}</Text>
+      /><Image source={{ uri: avatar }} style={tw`w-16 h-16 rounded-full`} />
+      <Text style={tw`mt-2 font-bold text-2xl`}>{userName}</Text>
+      <View
+        style={tw`flex flex-row items-center ${bgColor} px-1 rounded-full mt-2 gap-2 h-8`}
+      >
+        {renderIcon()}
+        <Text style={tw`font-semibold text-lg text-white pr-2`}>{planName} Plan</Text>
+      </View>
     </View>
   );
 };
@@ -68,7 +165,7 @@ const NavigateButton = ({
   icon,
   title,
 }: {
-  to: string; 
+  to: string;
   icon: string;
   title: string;
 }) => {
@@ -127,7 +224,7 @@ export default function AccountScreen() {
         <Text style={tw`text-xl font-semibold pt-4`}>Account Management</Text>
         <View style={tw`flex flex-col mt-2 p-4 bg-white gap-4 rounded-xl`}>
           <NavigateButton
-            to="/purchased.screen"
+            to="/purchase-history.screen"
             icon="profile"
             title="Purchase management"
           />
@@ -153,7 +250,9 @@ export default function AccountScreen() {
           />
         </View>
         <LogOutButton />
-        <Text style={tw`text-right pt-2 text-sm font-light`}>Version: 1.0.45</Text>
+        <Text style={tw`text-right pt-2 text-sm font-light`}>
+          Version: 1.0.45
+        </Text>
       </View>
     </View>
   );

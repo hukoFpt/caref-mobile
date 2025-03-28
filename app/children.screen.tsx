@@ -71,9 +71,9 @@ export default function ChildrenScreen() {
   }, []);
 
   return (
-    <View style={tw`flex-1`}>
+    <View style={tw``}>
       <Header
-        screenTitle="Child Selector"
+        screenTitle="Child Management"
         onBackPress={() => {
           router.push("/account.screen");
         }}

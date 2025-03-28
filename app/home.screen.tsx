@@ -8,13 +8,13 @@ import IndexStat from "@/components/index/IndexStat.component";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import childService from "@/service/child.service";
 import ProfileIcon from "@/assets/icons/Profile.icon";
+import { getBadge } from "@/utils/getBadge";
 
 interface UserData {
   id: string;
   email: string;
   role: string;
   userName: string;
-  subscription: string;
   avatar: string;
 }
 
@@ -46,10 +46,10 @@ export default function HomeScreen() {
     email: "",
     role: "",
     userName: "",
-    subscription: "No subscriptions",
     avatar: "https://picsum.photos/150",
   });
   const [selectedChildName, setSelectedChildName] = useState("Select a child");
+  const [orderCode, setOrderCode] = useState<string>("Free"); // State for the badge
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -113,8 +113,18 @@ export default function HomeScreen() {
       }
     };
 
+    const fetchOrderCode = async () => {
+      try {
+        const badge = await getBadge(); 
+        setOrderCode(badge); 
+      } catch (error) {
+        console.error("Failed to fetch order code", error);
+      }
+    };
+
     fetchUserData();
     fetchSelectedChild();
+    fetchOrderCode(); 
 
     logAsyncStorage();
   }, []);
@@ -124,7 +134,7 @@ export default function HomeScreen() {
       <UserCenter
         avatar={userData.avatar}
         name={userData.userName}
-        subscriptionPlan={userData.subscription}
+        subscriptionPlan={orderCode}
       />
       <ChildSelector selectedChildName={selectedChildName} />
       <IndexStat />
