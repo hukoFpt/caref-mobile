@@ -64,7 +64,7 @@ const NavBar = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={tw`flex flex-col items-center w-16`}
-          disabled={currentRoute === "/profile.screen"}
+          disabled={currentRoute === "/account.screen"}
           onPress={() => {
             router.push("/account.screen");
           }}

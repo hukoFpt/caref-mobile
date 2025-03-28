@@ -8,5 +8,4 @@ export interface Order {
   amount: number;
   description: string;
   createdAt: string;
-  __v: number;
 }

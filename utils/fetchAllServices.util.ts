@@ -17,6 +17,11 @@ export const fetchAllServices = async () => {
     // Fetch order data
     const order = await orderService.getMemberOrder();
     await AsyncStorage.setItem("orders", JSON.stringify(order));
+
+    // Fetch records data
+    const records = await recordService.getRecords();
+    await AsyncStorage.setItem("records", JSON.stringify(records));
+    
   } catch (error) {
     console.error("Failed to fetch services:", error);
     throw error; // Re-throw the error to handle it in the calling function
