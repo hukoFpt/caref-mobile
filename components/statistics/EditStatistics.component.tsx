@@ -143,6 +143,7 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
     setShowDatePicker(false); // Close the date picker
     if (selectedDate) {
       const formattedDate = formatDate(selectedDate);
+      console.log("Selected date:", formattedDate);
       setDate(formattedDate); // Update the selected date
       fetchStatistics(formattedDate); // Fetch statistics for the new date
     }
@@ -150,15 +151,38 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
 
   const fetchStatistics = async (selectedDate?: string) => {
     try {
-      const dateToFetch = selectedDate || date;
-      const existingStats = await AsyncStorage.getItem("statistics");
-      const statsData = existingStats ? JSON.parse(existingStats) : {};
-      const childStats = statsData[selectedChild._id];
+      const dateToFetch = selectedDate
+        ? selectedDate.split("-").reverse().join("-")
+        : date.split("-").reverse().join("-");
+      console.log("Fetching statistics for date:", dateToFetch);
 
-      if (childStats) {
-        // Find the latest date in the statistics
-        const latestDate = Object.keys(childStats).sort().reverse()[0];
-        const stats = childStats[dateToFetch] || childStats[latestDate];
+      // Fetch records from AsyncStorage
+      const recordsString = await AsyncStorage.getItem("records");
+      const records = recordsString ? JSON.parse(recordsString) : [];
+      console.log("Records Data:", records);
+
+      // Find the matching record for the selected child
+      const matchingRecord = records.find(
+        (record: any) => record.ChildId === selectedChild._id
+      );
+
+      const recordId = matchingRecord._id; // Use the matching record's _id
+      console.log("Matching Record ID:", recordId);
+
+      // Fetch trackings from AsyncStorage
+      const existingTrackings = await AsyncStorage.getItem("trackings");
+      const trackingsData = existingTrackings
+        ? JSON.parse(existingTrackings)
+        : {};
+      console.log("Trackings Data:", trackingsData);
+
+      const childTrackings = trackingsData[recordId]; // Use recordId to fetch trackings
+      console.log("Child Trackings:", childTrackings);
+
+      if (childTrackings) {
+        // Find the latest date in the trackings
+        const latestDate = Object.keys(childTrackings).sort().reverse()[0];
+        const stats = childTrackings[dateToFetch] || childTrackings[latestDate];
 
         if (stats) {
           setHeight(stats.height);
@@ -171,19 +195,19 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
           setWeight("");
           setBmi("");
           setBmiCategory("");
-          setLastUpdated(""); 
-          console.log("No statistics found for the selected date.");
+          setLastUpdated("");
+          console.log("No trackings found for the selected date.");
         }
       } else {
         setHeight("");
         setWeight("");
         setBmi("");
         setBmiCategory("");
-        setLastUpdated(""); 
-        console.log("No statistics found for the selected child.");
+        setLastUpdated("");
+        console.log("No trackings found for the selected child.");
       }
     } catch (error) {
-      console.error("Failed to fetch statistics", error);
+      console.error("Failed to fetch trackings", error);
     }
   };
 

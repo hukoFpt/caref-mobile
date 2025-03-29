@@ -8,14 +8,15 @@ import tw from "twrnc";
 
 const getCategoryColor = (category: string) => {
   switch (category) {
-    case "Underweight":
-    case "Overweight":
+    case "Severe Thinness":
+      return "text-rose-400";
+    case "Moderate Thinness":
       return "text-yellow-500";
-    case "Normal":
+    case "Normal Weight":
       return "text-green-500";
-    case "Obese":
+    case "Overweight":
       return "text-orange-500";
-    case "Severely Obese":
+    case "Obesity":
       return "text-rose-400";
     default:
       return "text-neutral-700";
@@ -78,7 +79,9 @@ const CalculatedStatBox = ({
       Last statistic updated:{" "}
       <Text style={tw`font-semibold`}>{lastUpdated}</Text>
     </Text>
-    <Text style={tw`${getCategoryColor(category)} font-semibold text-2xl mt-18`}>
+    <Text
+      style={tw`${getCategoryColor(category)} font-semibold text-2xl mt-18`}
+    >
       {category} Detected
     </Text>
   </View>
@@ -107,11 +110,30 @@ const IndexStat = () => {
           return;
         }
 
-        // Fetch statistics for the selected child
-        const statisticsString = await AsyncStorage.getItem("statistics");
-        const statistics = statisticsString ? JSON.parse(statisticsString) : {};
+        // Fetch records from AsyncStorage
+        const recordsString = await AsyncStorage.getItem("records");
+        const records = recordsString ? JSON.parse(recordsString) : [];
+        console.log("Records Data:", records);
 
-        const childStats = statistics[child._id];
+        // Find the matching record for the selected child
+        const matchingRecord = records.find(
+          (record: any) => record.ChildId === child._id
+        );
+
+        if (!matchingRecord) {
+          console.warn("No matching record found for the selected child.");
+          return;
+        }
+
+        const recordId = matchingRecord._id; // Use the matching record's _id
+        console.log("Matching Record ID:", recordId);
+
+        // Fetch trackings from AsyncStorage
+        const statisticsString = await AsyncStorage.getItem("trackings");
+        const statistics = statisticsString ? JSON.parse(statisticsString) : {};
+        console.log("Trackings Data:", statistics);
+
+        const childStats = statistics[recordId]; // Use recordId to fetch trackings
         if (childStats) {
           // Get the latest statistic based on the most recent date
           const latestDate = Object.keys(childStats).sort(

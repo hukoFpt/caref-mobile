@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import childService from "@/service/child.service";
 import recordService from "@/service/record.service";
 import orderService from "@/service/order.service";
+import trackingService from "@/service/tracking.service";
 
 export const fetchChildrenService = async () => {
   try {
@@ -39,6 +40,20 @@ export const fetchRecordsService = async () => {
     await AsyncStorage.setItem("records", JSON.stringify(updatedRecords));
   } catch (error) {
     console.error("Failed to fetch records service:", error);
+    throw error;
+  }
+};
+
+export const fetchMemberTrackingService = async (recordId: string) => {
+  try {
+    if (!recordId) {
+      console.warn("No record ID provided for fetching tracking data.");
+      return;
+    }
+
+    await trackingService.getMemberTracking(recordId); // Fetch and save tracking data
+  } catch (error) {
+    console.error("Failed to fetch member tracking service:", error);
     throw error;
   }
 };
