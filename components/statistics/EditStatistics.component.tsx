@@ -165,13 +165,13 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
           setWeight(stats.weight);
           setBmi(stats.bmi);
           setBmiCategory(stats.bmiCategory);
-          setLastUpdated(latestDate); // Set the latest date
+          setLastUpdated(latestDate);
         } else {
           setHeight("");
           setWeight("");
           setBmi("");
           setBmiCategory("");
-          setLastUpdated(""); // Clear the last updated date
+          setLastUpdated(""); 
           console.log("No statistics found for the selected date.");
         }
       } else {
@@ -179,7 +179,7 @@ const EditStatistics = ({ selectedChild }: { selectedChild: Child }) => {
         setWeight("");
         setBmi("");
         setBmiCategory("");
-        setLastUpdated(""); // Clear the last updated date
+        setLastUpdated(""); 
         console.log("No statistics found for the selected child.");
       }
     } catch (error) {
